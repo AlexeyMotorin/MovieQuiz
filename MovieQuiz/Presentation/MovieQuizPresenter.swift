@@ -5,15 +5,18 @@ final class MovieQuizPresenter {
     
     // MARK: - Private Properties
     private weak var viewController: MovieQuizViewControllerProtocol?
+    private var quizFactory: QuiestionFactoryProtocol?
     private var question: QuizQuestion?
     
-    private(set) var currentQuestionIndex = 0
+    private(set) var countQuestion = 10
     private(set) var correctAnswer = 0
+    private var currentQuestion = 0
     
     // MARK: - Initializer
     init(viewController: MovieQuizViewControllerProtocol) {
         self.viewController = viewController
-        question = MockQuestion.questions[currentQuestionIndex]
+        self.quizFactory = QuestionFactory(delegate: self)
+        quizFactory?.requestNextQuestion()
     }
     
     // MARK: Public Methods
@@ -32,7 +35,6 @@ final class MovieQuizPresenter {
     }
     
     func showQuestion() {
-        question = MockQuestion.questions[currentQuestionIndex]
         guard let question else { return }
         guard let viewModel = convert(model: question) else { return }
         viewController?.show(quiz: viewModel)
@@ -40,17 +42,17 @@ final class MovieQuizPresenter {
     
     
     func showNextQuestionOrResults() {
-        if currentQuestionIndex == MockQuestion.questions.count - 1 {
+        if currentQuestion == countQuestion - 1 {
             viewController?.showResultAlert()
         } else {
-            
-            currentQuestionIndex += 1
-            viewController?.nextQuestion()
+            currentQuestion += 1
+            quizFactory?.requestNextQuestion()
         }
     }
     
     func restartGame() {
-        currentQuestionIndex = 0
+        correctAnswer = 0
+        currentQuestion = 0
         viewController?.nextQuestion()
     }
     
@@ -58,7 +60,7 @@ final class MovieQuizPresenter {
     private func convert(model: QuizQuestion) -> QuizStepViewModel? {
         guard let image = UIImage(named: model.image) else { return nil }
         let question = model.text
-        let questionNumber = "\(currentQuestionIndex + 1)/\(MockQuestion.questions.count)"
+        let questionNumber = "\(currentQuestion + 1)/\(countQuestion)"
         let viewModel = QuizStepViewModel(image: image, question: question, questionNumber: questionNumber)
         return viewModel
     }
@@ -72,3 +74,17 @@ final class MovieQuizPresenter {
         }
     }
 }
+
+
+extension MovieQuizPresenter: QuestionFactoryDelegate {
+    func didReceiveNextQuestion(question: QuizQuestion?) {
+        guard let question = question else { return }
+        self.question = question
+        let viewModel = convert(model: question)
+        
+        DispatchQueue.main.async { [weak self] in
+            self?.viewController?.show(quiz: viewModel)
+        }
+    }
+}
+ 

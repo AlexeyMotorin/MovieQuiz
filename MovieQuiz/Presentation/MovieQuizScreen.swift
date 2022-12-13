@@ -4,9 +4,10 @@ final class MovieQuizScreen: UIView {
     
     // MARK: - Public Properties
     weak var viewController: MovieQuizViewControllerProtocol?
-    private var enabledButtons = true
-    
+ 
     // MARK: - Private Properties
+    private var enabledButtons = true
+   
     private lazy var stackView: UIStackView = {
         let stackView = UIStackView()
         stackView.translatesAutoresizingMaskIntoConstraints = false
@@ -115,7 +116,7 @@ final class MovieQuizScreen: UIView {
         return button
     }()
     
-    // MARK: - Initizlizers
+    // MARK: - Initializers
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.backgroundColor = .ypBackground
@@ -129,10 +130,10 @@ final class MovieQuizScreen: UIView {
     }
     
     // MARK: - Public Methods
-    func show(quiz step: QuizStepViewModel) {
-        previewImage.image = step.image
-        questionLabel.text = step.question
-        indexLabel.text = step.questionNumber
+    func show(quiz step: QuizStepViewModel?) {
+        previewImage.image = step?.image
+        questionLabel.text = step?.question
+        indexLabel.text = step?.questionNumber
     }
     
     func show(quiz result: QuizResultsViewModel) {

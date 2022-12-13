@@ -51,7 +51,7 @@ extension MovieQuizViewController: MovieQuizViewControllerProtocol {
         presenter.showQuestion()
     }
     
-    func show(quiz step: QuizStepViewModel) {
+    func show(quiz step: QuizStepViewModel?) {
         movieQuizScreen.show(quiz: step)
     }
     
@@ -69,7 +69,7 @@ extension MovieQuizViewController: MovieQuizViewControllerProtocol {
     
     func showResultAlert() {
         let title = "Раунд окончен!"
-        let message = "Ваш результат: \(presenter.correctAnswer)/\(presenter.currentQuestionIndex + 1)"
+        let message = "Ваш результат: \(presenter.correctAnswer)/\(presenter.countQuestion)"
         
         let alertModel = AlertModel(title: title, message: message, buttonText: "Сыграть еще раз") { [weak self] _ in
             self?.presenter.restartGame()
