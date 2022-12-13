@@ -69,8 +69,9 @@ extension MovieQuizViewController: MovieQuizViewControllerProtocol {
     
     func showResultAlert() {
         let title = "Раунд окончен!"
+        let message = "Ваш результат: \(presenter.correctAnswer)/\(presenter.currentQuestionIndex + 1)"
         
-        let alertModel = AlertModel(title: title, message: nil, buttonText: "Сыграть еще раз") { [weak self] _ in
+        let alertModel = AlertModel(title: title, message: message, buttonText: "Сыграть еще раз") { [weak self] _ in
             self?.presenter.restartGame()
         }
         alertPresenter.requestShowAlertResult(alertModel: alertModel)

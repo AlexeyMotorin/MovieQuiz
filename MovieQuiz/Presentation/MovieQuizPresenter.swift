@@ -8,7 +8,7 @@ final class MovieQuizPresenter {
     private var question: QuizQuestion?
     
     private(set) var currentQuestionIndex = 0
-    private var correctAnswer = 0
+    private(set) var correctAnswer = 0
     
     // MARK: - Initializer
     init(viewController: MovieQuizViewControllerProtocol) {
@@ -19,7 +19,8 @@ final class MovieQuizPresenter {
     // MARK: Public Methods
     func showAnswerResult(isCorrect: Bool) {
         viewController?.enableButtons()
-        let result = isCorrect == question?.correctAnswer
+        
+        let result = checkCorrectAnswer(result: isCorrect)
         
         viewController?.highlightImageBorder(isCorrectAnswer: result)
         
@@ -42,6 +43,7 @@ final class MovieQuizPresenter {
         if currentQuestionIndex == MockQuestion.questions.count - 1 {
             viewController?.showResultAlert()
         } else {
+            
             currentQuestionIndex += 1
             viewController?.nextQuestion()
         }
@@ -59,5 +61,14 @@ final class MovieQuizPresenter {
         let questionNumber = "\(currentQuestionIndex + 1)/\(MockQuestion.questions.count)"
         let viewModel = QuizStepViewModel(image: image, question: question, questionNumber: questionNumber)
         return viewModel
+    }
+    
+    private func checkCorrectAnswer(result: Bool) -> Bool {
+        if result == question?.correctAnswer {
+            correctAnswer += 1
+            return true
+        } else {
+            return false
+        }
     }
 }
