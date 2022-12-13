@@ -1,7 +1,7 @@
 import UIKit
 
 final class MovieQuizScreen: UIView {
-
+    
     // MARK: - Public Properties
     weak var viewController: MovieQuizViewControllerProtocol?
     private var enabledButtons = true
@@ -158,7 +158,7 @@ final class MovieQuizScreen: UIView {
             yesButton.isEnabled = true
             noButton.isEnabled = true
         }
-       enabledButtons = !enabledButtons
+        enabledButtons = !enabledButtons
     }
     
     // MARK: - Private Methods

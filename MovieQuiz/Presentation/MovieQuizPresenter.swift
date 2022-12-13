@@ -10,7 +10,7 @@ final class MovieQuizPresenter {
     private(set) var currentQuestionIndex = 0
     private var correctAnswer = 0
     
-    // MARK: - Initizlizers
+    // MARK: - Initializer
     init(viewController: MovieQuizViewControllerProtocol) {
         self.viewController = viewController
         question = MockQuestion.questions[currentQuestionIndex]
@@ -24,20 +24,33 @@ final class MovieQuizPresenter {
         viewController?.highlightImageBorder(isCorrectAnswer: result)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
-            self?.currentQuestionIndex += 1
+            self?.showNextQuestionOrResults()
             self?.viewController?.nextQuestion()
             self?.viewController?.enableButtons()
         }
     }
     
-    func showQuiesion() {
+    func showQuestion() {
         question = MockQuestion.questions[currentQuestionIndex]
         guard let question else { return }
         guard let viewModel = convert(model: question) else { return }
-        viewController?.showshow(quiz: viewModel)
+        viewController?.show(quiz: viewModel)
     }
     
     
+    func showNextQuestionOrResults() {
+        if currentQuestionIndex == MockQuestion.questions.count - 1 {
+            viewController?.showResultAlert()
+        } else {
+            currentQuestionIndex += 1
+            viewController?.nextQuestion()
+        }
+    }
+    
+    func restartGame() {
+        currentQuestionIndex = 0
+        viewController?.nextQuestion()
+    }
     
     // MARK: Private methods
     private func convert(model: QuizQuestion) -> QuizStepViewModel? {

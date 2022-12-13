@@ -5,13 +5,15 @@ class MovieQuizViewController: UIViewController {
     // MARK: private properties
     private var movieQuizScreen: MovieQuizScreen!
     private var presenter: MovieQuizPresenter!
+    private var alertPresenter: AlertPresenterProtocol!
     
     // MARK: Override Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         presenter = MovieQuizPresenter(viewController: self)
+        alertPresenter = AlertPresenter(delegate: self)
         viewSettings()
-        presenter.showQuiesion()
+        presenter.showQuestion()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -38,6 +40,7 @@ class MovieQuizViewController: UIViewController {
     }
 }
 
+// MARK: - MovieQuizViewControllerProtocol
 extension MovieQuizViewController: MovieQuizViewControllerProtocol {
     func highlightImageBorder(isCorrectAnswer: Bool) {
         movieQuizScreen.highlightImageBorder(isCorrectAnswer: isCorrectAnswer)
@@ -45,10 +48,10 @@ extension MovieQuizViewController: MovieQuizViewControllerProtocol {
     
     func nextQuestion() {
         movieQuizScreen.clearImageViewBorderColorAndImage()
-        presenter.showQuiesion()
+        presenter.showQuestion()
     }
     
-    func showshow(quiz step: QuizStepViewModel) {
+    func show(quiz step: QuizStepViewModel) {
         movieQuizScreen.show(quiz: step)
     }
     
@@ -62,5 +65,22 @@ extension MovieQuizViewController: MovieQuizViewControllerProtocol {
     
     func enableButtons() {
         movieQuizScreen.enableButtons()
+    }
+    
+    func showResultAlert() {
+        let title = "Раунд окончен!"
+        
+        let alertModel = AlertModel(title: title, message: nil, buttonText: "Сыграть еще раз") { [weak self] _ in
+            self?.presenter.restartGame()
+        }
+        alertPresenter.requestShowAlertResult(alertModel: alertModel)
+    }
+}
+
+// MARK: - AlertPresenterDelegate
+extension MovieQuizViewController: AlertPresenterDelegate {
+    func showAlert(alertController: UIAlertController?) {
+        guard let alertController else { return }
+        present(alertController, animated: true)
     }
 }
