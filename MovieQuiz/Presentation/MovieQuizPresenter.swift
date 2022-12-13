@@ -5,7 +5,7 @@ final class MovieQuizPresenter {
     
     // MARK: - Private Properties
     private weak var viewController: MovieQuizViewControllerProtocol?
-    private var quizFactory: QuiestionFactoryProtocol?
+    private var questionFactory: QuiestionFactoryProtocol?
     private var question: QuizQuestion?
     
     private(set) var countQuestion = 10
@@ -15,8 +15,8 @@ final class MovieQuizPresenter {
     // MARK: - Initializer
     init(viewController: MovieQuizViewControllerProtocol) {
         self.viewController = viewController
-        self.quizFactory = QuestionFactory(delegate: self)
-        quizFactory?.requestNextQuestion()
+        self.questionFactory = QuestionFactory(delegate: self)
+        questionFactory?.requestNextQuestion()
     }
     
     // MARK: Public Methods
@@ -29,31 +29,23 @@ final class MovieQuizPresenter {
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [weak self] in
             self?.showNextQuestionOrResults()
-            self?.viewController?.nextQuestion()
             self?.viewController?.enableButtons()
         }
     }
-    
-    func showQuestion() {
-        guard let question else { return }
-        guard let viewModel = convert(model: question) else { return }
-        viewController?.show(quiz: viewModel)
-    }
-    
     
     func showNextQuestionOrResults() {
         if currentQuestion == countQuestion - 1 {
             viewController?.showResultAlert()
         } else {
             currentQuestion += 1
-            quizFactory?.requestNextQuestion()
+            questionFactory?.requestNextQuestion()
         }
     }
     
     func restartGame() {
         correctAnswer = 0
         currentQuestion = 0
-        viewController?.nextQuestion()
+        questionFactory?.requestNextQuestion()
     }
     
     // MARK: Private methods

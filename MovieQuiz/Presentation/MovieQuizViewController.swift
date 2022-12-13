@@ -13,7 +13,6 @@ class MovieQuizViewController: UIViewController {
         presenter = MovieQuizPresenter(viewController: self)
         alertPresenter = AlertPresenter(delegate: self)
         viewSettings()
-        presenter.showQuestion()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -46,12 +45,8 @@ extension MovieQuizViewController: MovieQuizViewControllerProtocol {
         movieQuizScreen.highlightImageBorder(isCorrectAnswer: isCorrectAnswer)
     }
     
-    func nextQuestion() {
-        movieQuizScreen.clearImageViewBorderColorAndImage()
-        presenter.showQuestion()
-    }
-    
     func show(quiz step: QuizStepViewModel?) {
+        movieQuizScreen.clearImageViewBorderColorAndImage()
         movieQuizScreen.show(quiz: step)
     }
     
