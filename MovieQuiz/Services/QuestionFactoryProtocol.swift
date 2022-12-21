@@ -1,5 +1,5 @@
 import Foundation
 
-protocol QuiestionFactoryProtocol {
+protocol QuestionFactoryProtocol {
     func requestNextQuestion()
 }

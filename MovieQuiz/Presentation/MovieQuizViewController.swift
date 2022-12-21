@@ -5,13 +5,12 @@ class MovieQuizViewController: UIViewController {
     // MARK: private properties
     private var movieQuizScreen: MovieQuizScreen!
     private var presenter: MovieQuizPresenter!
-    private var alertPresenter: AlertPresenterProtocol!
+  
     
     // MARK: Override Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         presenter = MovieQuizPresenter(viewController: self)
-        alertPresenter = AlertPresenter(delegate: self)
         viewSettings()
     }
     
@@ -62,21 +61,10 @@ extension MovieQuizViewController: MovieQuizViewControllerProtocol {
         movieQuizScreen.enableButtons()
     }
     
-    func showResultAlert() {
-        let title = "Раунд окончен!"
-        let message = "Ваш результат: \(presenter.correctAnswer)/\(presenter.countQuestion)"
-        
-        let alertModel = AlertModel(title: title, message: message, buttonText: "Сыграть еще раз") { [weak self] _ in
-            self?.presenter.restartGame()
-        }
-        alertPresenter.requestShowAlertResult(alertModel: alertModel)
+    func showResultAlert(viewController: UIAlertController?) {
+        guard let viewController else { return }
+        present(viewController, animated: true)
     }
 }
 
-// MARK: - AlertPresenterDelegate
-extension MovieQuizViewController: AlertPresenterDelegate {
-    func showAlert(alertController: UIAlertController?) {
-        guard let alertController else { return }
-        present(alertController, animated: true)
-    }
-}
+

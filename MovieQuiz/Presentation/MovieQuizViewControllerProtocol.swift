@@ -1,4 +1,4 @@
-import Foundation
+import UIKit
 
 protocol MovieQuizViewControllerProtocol: AnyObject {
     func highlightImageBorder(isCorrectAnswer: Bool)
@@ -6,5 +6,5 @@ protocol MovieQuizViewControllerProtocol: AnyObject {
     func yesButtonClicked()
     func noButtonClicked()
     func enableButtons()
-    func showResultAlert()
+    func showResultAlert(viewController: UIAlertController?)
 }

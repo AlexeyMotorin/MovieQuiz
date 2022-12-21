@@ -2,11 +2,7 @@
 import UIKit
 
 final class AlertPresenter {
-    private weak var delegate: AlertPresenterDelegate?
-    
-    init(delegate: AlertPresenterDelegate? = nil) {
-        self.delegate = delegate
-    }
+    weak var delegate: AlertPresenterDelegate?
 }
 
 extension AlertPresenter: AlertPresenterProtocol {

@@ -135,11 +135,7 @@ final class MovieQuizScreen: UIView {
         questionLabel.text = step?.question
         indexLabel.text = step?.questionNumber
     }
-    
-    func show(quiz result: QuizResultsViewModel) {
         
-    }
-    
     func highlightImageBorder(isCorrectAnswer: Bool) {
         previewImage.layer.masksToBounds = true
         previewImage.layer.borderWidth = 8

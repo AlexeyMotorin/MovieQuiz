@@ -5,8 +5,10 @@ final class MovieQuizPresenter {
     
     // MARK: - Private Properties
     private weak var viewController: MovieQuizViewControllerProtocol?
-    private var questionFactory: QuiestionFactoryProtocol?
+    private var questionFactory: QuestionFactoryProtocol?
     private var question: QuizQuestion?
+    private var alertPresenter: AlertPresenterProtocol?
+    private var statisticServise: StatisticServiceProtocol?
     
     private(set) var countQuestion = 10
     private(set) var correctAnswer = 0
@@ -15,7 +17,14 @@ final class MovieQuizPresenter {
     // MARK: - Initializer
     init(viewController: MovieQuizViewControllerProtocol) {
         self.viewController = viewController
-        self.questionFactory = QuestionFactory(delegate: self)
+        
+        questionFactory = QuestionFactory(delegate: self)
+        
+        alertPresenter = AlertPresenter()
+        alertPresenter?.delegate = self
+        
+        statisticServise = StatisticServiceImplementation()
+        
         questionFactory?.requestNextQuestion()
     }
     
@@ -35,7 +44,8 @@ final class MovieQuizPresenter {
     
     func showNextQuestionOrResults() {
         if currentQuestion == countQuestion - 1 {
-            viewController?.showResultAlert()
+            saveStatistic()
+            showResultAlert()
         } else {
             currentQuestion += 1
             questionFactory?.requestNextQuestion()
@@ -65,9 +75,34 @@ final class MovieQuizPresenter {
             return false
         }
     }
+    
+    private func showResultAlert() {
+        guard let statisticServise else { return }
+        let bestGame = statisticServise.bestGame
+        
+        let title = "Раунд окончен!"
+        let message = """
+        Ваш результат: \(correctAnswer)/\(countQuestion)
+        Количество сыгранных квизов: \(statisticServise.gameCount)
+        Рекорд: \(bestGame.correct)/\(bestGame.total) \(bestGame.bestGame.dateTimeString)
+        Средняя точность: \(String(format: "%.2f", statisticServise.totalAccuracy))%
+        """
+        
+        let buttonText = "Сыграть еще раз"
+        
+        let alertModel = AlertModel(title: title, message: message, buttonText: buttonText ) { [weak self] _ in
+            self?.restartGame()
+        }
+        
+        alertPresenter?.requestShowAlertResult(alertModel: alertModel)
+    }
+    
+    private func saveStatistic() {
+        statisticServise?.store(correct: correctAnswer, total: countQuestion)
+    }
 }
 
-
+//MARK: - QuestionFactoryDelegate
 extension MovieQuizPresenter: QuestionFactoryDelegate {
     func didReceiveNextQuestion(question: QuizQuestion?) {
         guard let question = question else { return }
@@ -79,4 +114,11 @@ extension MovieQuizPresenter: QuestionFactoryDelegate {
         }
     }
 }
- 
+
+//MARK: - AlertPresenterDelegate
+extension MovieQuizPresenter: AlertPresenterDelegate {
+    func showAlert(alertController: UIAlertController?) {
+        viewController?.showResultAlert(viewController: alertController)
+    }
+}
+

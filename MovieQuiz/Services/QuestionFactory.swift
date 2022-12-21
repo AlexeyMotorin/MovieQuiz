@@ -8,7 +8,7 @@ final class QuestionFactory {
     }
 }
 
-extension QuestionFactory: QuiestionFactoryProtocol {
+extension QuestionFactory: QuestionFactoryProtocol {
     func requestNextQuestion() {
         
         let randomIndex = Int.random(in:  0..<MockQuestion.questions.count)
