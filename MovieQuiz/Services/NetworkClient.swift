@@ -5,7 +5,8 @@ protocol NetworkRouting {
 }
 
 struct NetworkClient: NetworkRouting {
-    // MARK: - private Enum
+   
+    // MARK: - private EnumError
     private enum NetworkError: Error {
         case loadError
     }
