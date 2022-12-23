@@ -5,7 +5,7 @@ final class MovieQuizPresenter {
     
     // MARK: - Private Properties
     private weak var viewController: MovieQuizViewControllerProtocol?
-    private var questionFactory: QuestionFactoryProtocol?
+    private(set) var questionFactory: QuestionFactoryProtocol?
     private var question: QuizQuestion?
     private var alertPresenter: AlertPresenterProtocol?
     private var statisticServise: StatisticServiceProtocol?
@@ -18,7 +18,7 @@ final class MovieQuizPresenter {
     init(viewController: MovieQuizViewControllerProtocol) {
         self.viewController = viewController
         
-        questionFactory = QuestionFactory(delegate: self)
+        questionFactory = QuestionFactory(delegate: self, moviesLoader: MoviesLoader())
         
         alertPresenter = AlertPresenter()
         alertPresenter?.delegate = self
@@ -104,6 +104,18 @@ final class MovieQuizPresenter {
 
 //MARK: - QuestionFactoryDelegate
 extension MovieQuizPresenter: QuestionFactoryDelegate {
+    func didLoadDataFromServer() {
+        
+    }
+    
+    func didFailToLoadData(with error: Error) {
+        
+    }
+    
+    func didFailToLoadImage(with error: Error) {
+        
+    }
+    
     func didReceiveNextQuestion(question: QuizQuestion?) {
         guard let question = question else { return }
         self.question = question

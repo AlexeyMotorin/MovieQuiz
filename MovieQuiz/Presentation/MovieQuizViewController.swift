@@ -11,6 +11,7 @@ class MovieQuizViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         presenter = MovieQuizPresenter(viewController: self)
+        presenter.questionFactory?.loadData()
         viewSettings()
     }
     
