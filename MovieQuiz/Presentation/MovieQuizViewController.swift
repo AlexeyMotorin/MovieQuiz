@@ -36,11 +36,33 @@ class MovieQuizViewController: UIViewController {
             movieQuizScreen.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             movieQuizScreen.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
+        
+        movieQuizScreen.showLoadingIndicator()
+    }
+    
+    private func viewScreenError() {
+        movieQuizScreen.errorInternetViewSettings()
     }
 }
 
 // MARK: - MovieQuizViewControllerProtocol
 extension MovieQuizViewController: MovieQuizViewControllerProtocol {
+    func showLoadingIndicator() {
+        DispatchQueue.main.async { [weak self] in
+            self?.movieQuizScreen.showLoadingIndicator()
+        }
+    }
+    
+    func hideLoadingIndicator() {
+        DispatchQueue.main.async { [weak self] in
+            self?.movieQuizScreen.hideLoadingIndicator()
+        }
+    }
+    
+    func showErrorScreen() {
+        viewScreenError()
+    }
+    
     func highlightImageBorder(isCorrectAnswer: Bool) {
         movieQuizScreen.highlightImageBorder(isCorrectAnswer: isCorrectAnswer)
     }

@@ -12,7 +12,7 @@ final class MovieQuizPresenter {
     
     private(set) var countQuestion = 10
     private(set) var correctAnswer = 0
-    private var currentQuestion = 0
+    private var currentQuestionIndex = 0
     
     // MARK: - Initializer
     init(viewController: MovieQuizViewControllerProtocol) {
@@ -43,31 +43,34 @@ final class MovieQuizPresenter {
     }
     
     func showNextQuestionOrResults() {
-        if currentQuestion == countQuestion - 1 {
+        if self.isLastGame() {
             saveStatistic()
             showResultAlert()
         } else {
-            currentQuestion += 1
+            switchToNextQuestion()
             questionFactory?.requestNextQuestion()
         }
     }
     
     func restartGame() {
+        resetCorrectAnswerAndCurrentIndex()
         correctAnswer = 0
-        currentQuestion = 0
+        currentQuestionIndex = 0
         questionFactory?.requestNextQuestion()
     }
     
+    
     // MARK: Private methods
     private func convert(model: QuizQuestion) -> QuizStepViewModel? {
-        guard let image = UIImage(named: model.image) else { return nil }
+        guard let image = UIImage(data: model.image) else { return nil }
         let question = model.text
-        let questionNumber = "\(currentQuestion + 1)/\(countQuestion)"
+        let questionNumber = "\(currentQuestionIndex + 1)/\(countQuestion)"
         let viewModel = QuizStepViewModel(image: image, question: question, questionNumber: questionNumber)
         return viewModel
     }
     
     private func checkCorrectAnswer(result: Bool) -> Bool {
+        viewController?.showLoadingIndicator()
         if result == question?.correctAnswer {
             correctAnswer += 1
             return true
@@ -76,6 +79,30 @@ final class MovieQuizPresenter {
         }
     }
     
+    private func saveStatistic() {
+        statisticServise?.store(correct: correctAnswer, total: countQuestion)
+    }
+    
+
+    
+    // MARK: - check Game methods
+    private func isLastGame() -> Bool {
+        currentQuestionIndex == countQuestion - 1
+    }
+    
+    private func resetCorrectAnswerAndCurrentIndex() {
+        currentQuestionIndex = 0
+        correctAnswer = 0
+    }
+    
+    func switchToNextQuestion() {
+        currentQuestionIndex += 1
+    }
+
+}
+
+// MARK: - Alert
+extension MovieQuizPresenter {
     private func showResultAlert() {
         guard let statisticServise else { return }
         let bestGame = statisticServise.bestGame
@@ -97,23 +124,59 @@ final class MovieQuizPresenter {
         alertPresenter?.requestShowAlertResult(alertModel: alertModel)
     }
     
-    private func saveStatistic() {
-        statisticServise?.store(correct: correctAnswer, total: countQuestion)
+    private func showNetworkError(message: String) {
+    
+        let title = "Ошибка"
+        let buttonText = "Попробовать еще раз"
+        
+        let alertModel = AlertModel(title: title, message: message, buttonText: buttonText) { [weak self] _ in
+            guard let self = self else { return }
+
+            self.questionFactory?.loadData()
+        }
+        
+        alertPresenter?.requestShowAlertResult(alertModel: alertModel)
+    }
+    
+    func showImageError(message: String) {
+    
+        let title = "Ошибка загрузки вопроса"
+        let buttonText = "Повторить"
+        
+        let alertModel = AlertModel(title: title, message: message, buttonText: buttonText) { [weak self] _ in
+            guard let self = self else { return }
+            self.questionFactory?.requestNextQuestion()
+        }
+        
+        alertPresenter?.requestShowAlertResult(alertModel: alertModel)
     }
 }
 
 //MARK: - QuestionFactoryDelegate
 extension MovieQuizPresenter: QuestionFactoryDelegate {
     func didLoadDataFromServer() {
-        
+        viewController?.hideLoadingIndicator()
+        questionFactory?.requestNextQuestion()
     }
     
     func didFailToLoadData(with error: Error) {
+        let error = error.localizedDescription
         
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.viewController?.showErrorScreen()
+            self.showNetworkError(message: error)
+        }
     }
     
     func didFailToLoadImage(with error: Error) {
+        let error = error.localizedDescription
         
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.viewController?.showErrorScreen()
+            self.showImageError(message: error)
+        }
     }
     
     func didReceiveNextQuestion(question: QuizQuestion?) {
@@ -122,6 +185,7 @@ extension MovieQuizPresenter: QuestionFactoryDelegate {
         let viewModel = convert(model: question)
         
         DispatchQueue.main.async { [weak self] in
+            self?.viewController?.hideLoadingIndicator()
             self?.viewController?.show(quiz: viewModel)
         }
     }

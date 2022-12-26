@@ -7,4 +7,7 @@ protocol MovieQuizViewControllerProtocol: AnyObject {
     func noButtonClicked()
     func enableButtons()
     func showResultAlert(viewController: UIAlertController?)
+    func showErrorScreen()
+    func showLoadingIndicator()
+    func hideLoadingIndicator()
 }

@@ -49,6 +49,7 @@ final class MovieQuizScreen: UIView {
         label.numberOfLines = 1
         label.textAlignment = .right
         label.text = "1/10"
+        label.accessibilityIdentifier = "Index"
         return label
     }()
     
@@ -58,6 +59,7 @@ final class MovieQuizScreen: UIView {
         imageView.layer.cornerRadius = Constants.cornerRadius
         imageView.clipsToBounds = true
         imageView.contentMode = .scaleAspectFill
+        imageView.accessibilityIdentifier = "Poster"
         imageView.backgroundColor = .ypWhite
         return imageView
     }()
@@ -76,7 +78,6 @@ final class MovieQuizScreen: UIView {
         label.textColor = .ypWhite
         label.numberOfLines = 0
         label.textAlignment = .center
-        label.text = "Рейтинг этого фильма меньше, чем 5?"
         return label
     }()
     
@@ -100,6 +101,7 @@ final class MovieQuizScreen: UIView {
         button.titleLabel?.font = UIFont.ypBold18
         button.layer.cornerRadius = 15
         button.setTitle("Да", for: .normal)
+        button.accessibilityIdentifier = "Yes"
         button.addTarget(self, action: #selector(yesButtonClicked), for: .touchUpInside)
         return button
     }()
@@ -112,8 +114,17 @@ final class MovieQuizScreen: UIView {
         button.titleLabel?.font = UIFont.ypBold18
         button.layer.cornerRadius = 15
         button.setTitle("Нет", for: .normal)
+        button.accessibilityIdentifier = "No"
         button.addTarget(self, action: #selector(noButtonClicked), for: .touchUpInside)
         return button
+    }()
+    
+    private lazy var loadigIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .large)
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        indicator.hidesWhenStopped = true
+        indicator.color = UIColor.ypGray
+        return indicator
     }()
     
     // MARK: - Initializers
@@ -158,6 +169,20 @@ final class MovieQuizScreen: UIView {
         enabledButtons = !enabledButtons
     }
     
+    func errorInternetViewSettings() {
+        previewImage.image = nil
+        questionLabel.text = "ERROR"
+        previewImage.layer.borderColor = UIColor.clear.cgColor
+    }
+    
+    func showLoadingIndicator() {
+        loadigIndicator.startAnimating()
+    }
+    
+    func hideLoadingIndicator() {
+        loadigIndicator.stopAnimating()
+    }
+    
     // MARK: - Private Methods
     private func addView() {
         self.addSubview(stackView)
@@ -167,6 +192,7 @@ final class MovieQuizScreen: UIView {
         questionTitleAndIndexLabelStackView.addArrangedSubview(indexLabel)
         
         stackView.addArrangedSubview(previewImage)
+        previewImage.addSubview(loadigIndicator)
         
         stackView.addArrangedSubview(viewForQuestionLabel)
         viewForQuestionLabel.addSubview(questionLabel)
@@ -196,7 +222,10 @@ final class MovieQuizScreen: UIView {
             trailingQuestionLabelConstraint,
             bottomQuestionLabelConstraint,
             
-            yesButton.heightAnchor.constraint(equalToConstant: 60)
+            yesButton.heightAnchor.constraint(equalToConstant: 60),
+            
+            loadigIndicator.centerXAnchor.constraint(equalTo: previewImage.centerXAnchor),
+            loadigIndicator.centerYAnchor.constraint(equalTo: previewImage.centerYAnchor)
         ])
     }
     
