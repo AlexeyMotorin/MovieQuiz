@@ -59,9 +59,7 @@ final class MovieQuizPresenter {
         questionFactory?.requestNextQuestion()
     }
     
-    
-    // MARK: Private methods
-    private func convert(model: QuizQuestion) -> QuizStepViewModel? {
+    func convert(model: QuizQuestion) -> QuizStepViewModel? {
         guard let image = UIImage(data: model.image) else { return nil }
         let question = model.text
         let questionNumber = "\(currentQuestionIndex + 1)/\(countQuestion)"
@@ -69,6 +67,7 @@ final class MovieQuizPresenter {
         return viewModel
     }
     
+    // MARK: Private methods
     private func checkCorrectAnswer(result: Bool) -> Bool {
         viewController?.showLoadingIndicator()
         if result == question?.correctAnswer {
