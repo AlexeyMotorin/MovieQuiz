@@ -23,8 +23,8 @@ struct MoviesLoader {
     }
     
     // MARK: - Initializer
-    init(networkClien: NetworkRouting = NetworkClient()) {
-        self.networkClien = networkClien
+    init(networkClient: NetworkRouting = NetworkClient()) {
+        self.networkClien = networkClient
     }
 }
 
